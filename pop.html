@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+		<title>Pop2010</title>
+
+		<style>
+			html,
+			body,
+			#viewDiv {
+				padding: 0;
+				margin: 0;
+				height: 100%;
+				width: 100%;
+			}
+		</style>
+
+		<link rel="stylesheet" href="https://js.arcgis.com/4.11/esri/themes/light/main.css" />
+		<script src="https://js.arcgis.com/4.11/"></script>
+
+		<script>
+			require([
+				"esri/Map",
+				"esri/layers/GeoJSONLayer",
+				"esri/views/MapView",
+				"esri/widgets/Legend",
+			], function(Map, GeoJSONLayer, MapView, Legend) {
+				var map = new Map({
+					basemap: "osm"
+				});
+				
+				var view = new MapView({
+					container: "viewDiv",
+					center: [114.3, 30.5],
+					zoom: 4,
+					map: map
+				});
+				
+				var defaultSym = {
+					type: "simple-fill",
+					outline: {
+						color: "#EEEED1",
+						width: "0.5px"
+					}
+				};
+				
+				var renderer = {
+						type: "simple", // autocasts as new SimpleRenderer()
+						symbol: defaultSym,
+						visualVariables: [
+							{
+								type: "color", // indicates this is a color visual variable
+								field: "pop2010", // total population in poverty
+								stops: [
+									{
+										value: 5000000, 
+										color: "#EE82EE",
+									},
+									{
+										value: 100000000, 
+										color: "#EE1289", 
+									}
+								],
+								legendOptions: {
+									title: "人口数量"
+								}
+							}
+						]
+					};
+
+				var fl = new GeoJSONLayer({
+					url: "https://wbt1124.github.io/t_pop/chinawgs84.geojson",
+					title: "2010年中国人口数量分布图",
+					renderer: renderer,
+				});
+				map.add(fl)
+			
+						view.ui.add(
+					new Legend({
+						view:view,
+						layerInfos: [{
+							layer: fl,
+							title: "Legend"
+						}]
+					}),
+					"top-right"
+				);
+			});
+		</script>
+	</head>
+
+	<body>
+		<div id="viewDiv"></div>
+	</body>
+</html>
